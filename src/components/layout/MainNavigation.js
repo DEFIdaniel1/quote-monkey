@@ -10,12 +10,12 @@ const MainNavigation = () => {
       <nav className={classes.nav}>
         <ul>
           <li>
-            <NavLink activeClassName={classes.active} to="./quotes">
+            <NavLink activeClassName={classes.active} to="/quotes">
               All Quotes
             </NavLink>
           </li>
           <li>
-            <NavLink activeClassName={classes.active} to="./add-quote">
+            <NavLink activeClassName={classes.active} to="/add-quote">
               Add a Quote
             </NavLink>
           </li>
