@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Route, useParams } from "react-router-dom";
+import { Route, useParams, useHistory, useRouteMatch } from "react-router-dom";
 
 import Comments from "../components/comments/Comments";
 import HighlightedQuote from "../components/quotes/HighlightedQuote";
@@ -19,20 +19,33 @@ const DUMMY_QUOTES = [
 
 const QuoteDetails = () => {
   const params = useParams();
+  const history = useHistory();
+  const match = useRouteMatch();
   const quote = DUMMY_QUOTES.find((quote) => quote.id === params.quoteId);
 
   if (!quote) {
     return <p>Sorry, no quote found!</p>;
   }
 
-  return (
-    <Fragment>
-      <h1>Quote Details Page</h1>
-      <HighlightedQuote text={quote.text} author={quote.author} />
-      <Route path={`/quotes/${params.quoteId}/comments`}>
-        <Comments></Comments>
-      </Route>
-    </Fragment>
-  );
+  const toggleCommentHandler = () => {
+    history.push(`${match.path}/comments`);
+  };
+
+    return (
+      <Fragment>
+        <h1>Quote Details Page</h1>
+        <HighlightedQuote text={quote.text} author={quote.author} />
+        <Route path={`${match.path}/`} exact>
+          <div className="centered">
+            <button className={"btn--flat"} onClick={toggleCommentHandler}>
+              Show Comments
+            </button>
+          </div>
+        </Route>
+        <Route path={`/quotes/${params.quoteId}/comments`}>
+          <Comments />
+        </Route>
+      </Fragment>
+    );
 };
 export default QuoteDetails;
