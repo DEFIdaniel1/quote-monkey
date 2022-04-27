@@ -1,26 +1,44 @@
-import React, {Fragment} from 'react';
+import React, { Fragment, useEffect } from "react";
 
-import QuoteList from '../components/quotes/QuoteList';
-
-const DUMMY_QUOTES = [
-  {
-    id: "q1",
-    author: "Ghandi",
-    text: "Be the change that you wish to see in the world.",
-  },
-  {
-    id: "q2",
-    author: "John Lennon",
-    text: "Life is what happens to you while you're busy making other plans..",
-  },
-];
+import useHttp from "../components/hooks/use-http";
+import { getAllQuotes } from "../components/lib/api";
+import QuoteList from "../components/quotes/QuoteList";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
+import NoQuotesFound from '../components/quotes/NoQuotesFound';
 
 const Quotes = () => {
+  const {
+    sendRequest,
+    status,
+    data: loadedQuotes,
+    error,
+  } = useHttp(getAllQuotes, true);
+
+  useEffect(() => {
+    sendRequest();
+  }, [sendRequest]);
+
+  if (status === "pending") {
+    return (
+      <div className="centered">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="centered">{error}</p>
+  }
+
+  if (status === 'completed' && (!loadedQuotes || loadedQuotes.length === 0)){
+    return <NoQuotesFound />
+  }
+
   return (
     <Fragment>
-      <QuoteList quotes={DUMMY_QUOTES}/>
+      <QuoteList quotes={loadedQuotes} />
     </Fragment>
   );
-}
+};
 
-export default Quotes
+export default Quotes;

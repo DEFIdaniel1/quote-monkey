@@ -1,51 +1,60 @@
-import React, { Fragment } from "react";
-import { Route, useParams, useHistory, useRouteMatch } from "react-router-dom";
+import { Fragment, useEffect } from "react";
+import { useParams, Route, Link, useRouteMatch } from "react-router-dom";
 
-import Comments from "../components/comments/Comments";
 import HighlightedQuote from "../components/quotes/HighlightedQuote";
+import Comments from "../components/comments/Comments";
+import useHttp from "../components/hooks/use-http";
+import { getSingleQuote } from "../components/lib/api";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
-const DUMMY_QUOTES = [
-  {
-    id: "q1",
-    author: "Ghandi",
-    text: "Be the change that you wish to see in the world.",
-  },
-  {
-    id: "q2",
-    author: "John Lennon",
-    text: "Life is what happens to you while you're busy making other plans..",
-  },
-];
-
-const QuoteDetails = () => {
-  const params = useParams();
-  const history = useHistory();
+const QuoteDetail = () => {
   const match = useRouteMatch();
-  const quote = DUMMY_QUOTES.find((quote) => quote.id === params.quoteId);
+  const params = useParams();
 
-  if (!quote) {
-    return <p>Sorry, no quote found!</p>;
+  const { quoteId } = params;
+
+  const {
+    sendRequest,
+    status,
+    data: loadedQuote,
+    error,
+  } = useHttp(getSingleQuote, true);
+
+  useEffect(() => {
+    sendRequest(quoteId);
+  }, [sendRequest, quoteId]);
+
+  if (status === "pending") {
+    return (
+      <div className="centered">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
-  const toggleCommentHandler = () => {
-    history.push(`${match.path}/comments`);
-  };
+  if (error) {
+    return <p className="centered">{error}</p>;
+  }
 
-    return (
-      <Fragment>
-        <h1>Quote Details Page</h1>
-        <HighlightedQuote text={quote.text} author={quote.author} />
-        <Route path={`${match.path}/`} exact>
-          <div className="centered">
-            <button className={"btn--flat"} onClick={toggleCommentHandler}>
-              Show Comments
-            </button>
-          </div>
-        </Route>
-        <Route path={`/quotes/${params.quoteId}/comments`}>
-          <Comments />
-        </Route>
-      </Fragment>
-    );
+  if (!loadedQuote.text) {
+    return <p>No quote found!</p>;
+  }
+
+  return (
+    <Fragment>
+      <HighlightedQuote text={loadedQuote.text} author={loadedQuote.author} />
+      <Route path={match.path} exact>
+        <div className="centered">
+          <Link className="btn--flat" to={`${match.url}/comments`}>
+            Load Comments
+          </Link>
+        </div>
+      </Route>
+      <Route path={`${match.path}/comments`}>
+        <Comments />
+      </Route>
+    </Fragment>
+  );
 };
-export default QuoteDetails;
+
+export default QuoteDetail;
