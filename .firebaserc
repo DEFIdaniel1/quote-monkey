@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "react-http-89657"
-  }
+    "default": "daniel-pisterzi",
+    "daniel-pisterzi": "daniel-pisterzi"
+  },
+  "targets": {}
 }
