@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "pisterzi-quote",
     "public": "build",
     "ignore": [
       "firebase.json",
